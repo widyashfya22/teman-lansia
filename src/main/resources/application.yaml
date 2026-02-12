@@ -1,11 +1,13 @@
 spring:
   application:
     name: temanlansia-backend
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/db_teman-lansia
-    username: root
-    password:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,10 +18,9 @@ spring:
         format_sql: true
 
 server:
-  port: 9000
+  port: ${PORT:9000}
 
 app:
   jwt:
-    # Ganti secret untuk produksi!
-    secret: 177cktj1e2/dLgckDyzIF8GoYubng3KHksAbU5rl3y8=
+    secret: ${JWT_SECRET}
     expiration-ms: 86400000
