@@ -1,5 +1,6 @@
 package com.temanlansiabe.temanlansia_backend.security;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
@@ -21,8 +21,10 @@ public class JwtService {
     private final long expirationMillis;
 
     public JwtService(
-        @Value("${app.jwt.secret:U3VwZXJTZWNyZXRLZXlGb3JUZW1hbkxhbnNpYQ==}") String secret,
-        @Value("${app.jwt.expiration-ms:86400000}") long expirationMillis
+        @Value("${app.jwt.secret:temanlansia_secure_production_secret_2026_super_secure_key_32chars}")
+        String secret,
+        @Value("${app.jwt.expiration-ms:86400000}")
+        long expirationMillis
     ) {
         this.secret = secret;
         this.expirationMillis = expirationMillis;
@@ -39,11 +41,11 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
-            .setSubject(userDetails.getUsername())
-            .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
-            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-            .compact();
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -60,16 +62,14 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts
-            .parserBuilder()
-            .setSigningKey(getSignInKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 }
